@@ -1,0 +1,44 @@
+Illuminate\Database\QueryException
+vendor\laravel\framework\src\Illuminate\Database\Connection.php:838
+SQLSTATE[HY000]: General error: 1366 Incorrect decimal value: 'sdafsdfasfasdf' for column 'price' at row 1 (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: shop, SQL: insert into `products` (`name`, `description`, `price`, `category_id`, `image`, `updated_at`, `created_at`) values (Gaming Chair, sdfsdfsdf, sdafsdfasfasdf, 3, Ca7GiU9MZIZc9SzTtjUQ8sqVXfxfZcsupP2wOfRz.webp, 2026-03-09 09:35:37, 2026-03-09 09:35:37))
+
+
+Illuminate\Database\QueryException
+vendor\laravel\framework\src\Illuminate\Database\Connection.php:838
+SQLSTATE[23000]: Integrity constraint violation: 1048 Column 'name' cannot be null (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: shop, SQL: insert into `products` (`name`, `description`, `price`, `category_id`, `image`, `updated_at`, `created_at`) values (?, sdfsdfsdf, 20000, 3, 9m7HYflaqCd2iTNe0AgdzJtSy3rvqU0AJw8uyypY.webp, 2026-03-09 09:36:14, 2026-03-09 09:36:14))
+
+
+
+Illuminate\Database\QueryException
+vendor\laravel\framework\src\Illuminate\Database\Connection.php:838
+SQLSTATE[22001]: String data, right truncated: 1406 Data too long for column 'name' at row 1 (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: shop, SQL: insert into `products` (`name`, `description`, `price`, `category_id`, `image`, `updated_at`, `created_at`) values (Illuminate\Database\QueryException vendor\laravel\framework\src\Illuminate\Database\Connection.php:838 SQLSTATE[23000]: Integrity constraint violation: 1048 Column 'name' cannot be null (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: shop, SQL: insert into `products` (`name`, `description`, `price`, `category_id`, `image`, `updated_at`, `created_at`) values (?, sdfsdfsdf, 20000, 3, 9m7HYflaqCd2iTNe0AgdzJtSy3rvqU0AJw8uyypY.webp, 2026-03-09 09:36:14, 2026-03-09 09:36:14)), ?, 20000, 3, CZC4dkZx2OW3LfrtgMVWBrfAO8nfqbsBjI9ODaIi.webp, 2026-03-09 09:36:35, 2026-03-09 09:36:35))
+
+
+Illuminate\Database\QueryException
+vendor\laravel\framework\src\Illuminate\Database\Connection.php:838
+SQLSTATE[22001]: String data, right truncated: 1406 Data too long for column 'name' at row 1 (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: shop, SQL: insert into `products` (`name`, `description`, `price`, `category_id`, `image`, `updated_at`, `created_at`) values (Illuminate\Database\QueryException vendor\laravel\framework\src\Illuminate\Database\Connection.php:838 SQLSTATE[HY000]: General error: 1366 Incorrect decimal value: 'sdafsdfasfasdf' for column 'price' at row 1 (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: shop, SQL: insert into `products` (`name`, `description`, `price`, `category_id`, `image`, `updated_at`, `created_at`) values (Gaming Chair, sdfsdfsdf, sdafsdfasfasdf, 3, Ca7GiU9MZIZc9SzTtjUQ8sqVXfxfZcsupP2wOfRz.webp, 2026-03-09 09:35:37, 2026-03-09 09:35:37)) Illuminate\Database\QueryException vendor\laravel\framework\src\Illuminate\Database\Connection.php:838 SQLSTATE[23000]: Integrity constraint violation: 1048 Column 'name' cannot be null (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: shop, SQL: insert into `products` (`name`, `description`, `price`, `category_id`, `image`, `updated_at`, `created_at`) values (?, sdfsdfsdf, 20000, 3, 9m7HYflaqCd2iTNe0AgdzJtSy3rvqU0AJw8uyypY.webp, 2026-03-09 09:36:14, 2026-03-09 09:36:14)) Illuminate\Database\QueryException vendor\laravel\framework\src\Illuminate\Database\Connection.php:838 SQLSTATE[22001]: String data, right truncated: 1406 Data too long for column 'name' at row 1 (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: shop, SQL: insert into `products` (`name`, `description`, `price`, `category_id`, `image`, `updated_at`, `created_at`) values (Illuminate\Database\QueryException vendor\laravel\framework\src\Illuminate\Database\Connection.php:838 SQLSTATE[23000]: Integrity constraint violation: 1048 Column 'name' cannot be null (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: shop, SQL: insert into `products` (`name`, `description`, `price`, `category_id`, `image`, `updated_at`, `created_at`) values (?, sdfsdfsdf, 20000, 3, 9m7HYflaqCd2iTNe0AgdzJtSy3rvqU0AJw8uyypY.webp, 2026-03-09 09:36:14, 2026-03-09 09:36:14)), ?, 20000, 3,
+
+Illuminate\Database\QueryException
+vendor\laravel\framework\src\Illuminate\Database\Connection.php:838
+SQLSTATE[22003]: Numeric value out of range: 1264 Out of range value for column 'price' at row 1 (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: shop, SQL: insert into `products` (`name`, `description`, `price`, `category_id`, `image`, `updated_at`, `created_at`) values (hello, xfzgbdfgxfz, 200009999999999999999999999999999999999999999999999999999999999999999999999999, 3, SjbK1X2R3oOk4tmcU9uIhf1aSZXNCpdZJ3KzEQnr.webp, 2026-03-09 09:38:09, 2026-03-09 09:38:09))
+
+
+
+,'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).+$/'
+
+
+ $request->validate([
+        'image' => 'required|image|mimes:jpg,jpeg,png,gif|max:2048'
+    ]);
+
+    if ($request->hasFile('image')) {
+
+        $image = $request->file('image');
+
+        // Get original file name
+        $imageName = $image->getClientOriginalName();
+
+        // Move image to folder
+        $image->move(public_path('uploads'), $imageName);
+
+    }
