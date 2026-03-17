@@ -37,6 +37,10 @@ class UserController extends Controller
                 if ($user->status === "active") {
                     // Generate OTP
                     $otp = rand(100000, 999999);
+
+                    $user->otp=$otp;
+                    $user->otp_expire_at =now()->addMinutes(5);
+                    $user->save();
                     // Store OTP and user ID in session
                     session([
                         'login_otp' => $otp,
@@ -47,7 +51,7 @@ class UserController extends Controller
                     Auth::logout();
 
                     // Send OTP mail
-                    Mail::to($user->email)->send(new OtpMail($otp));
+                    //Mail::to($user->email)->send(new OtpMail($otp));
 
                     return response()->json([
                         'status' => 'otp_required',
@@ -82,8 +86,8 @@ class UserController extends Controller
                 ]
             );
 
-            if ($request->otp == session('login_otp')) {
-                $user = User::find(session('login_user_id'));
+            $user = User::where('otp',$request->otp)->first();
+            if (!empty($user) && now() <= $user->otp_expire_at) {
                 Auth::login($user);
                 $request->session()->regenerate();
                 session()->forget(['login_otp', 'login_user_id']);
