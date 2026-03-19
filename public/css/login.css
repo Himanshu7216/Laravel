@@ -25,3 +25,7 @@ input[readonly] {
     opacity: 0.8;
     pointer-events: none;
 }
+.locked-field {
+    background-color: #ffe5b4 !important; /* light orange */
+    cursor: not-allowed;
+}

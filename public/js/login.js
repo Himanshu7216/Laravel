@@ -101,6 +101,23 @@ $(document).ready(function () {
                 isValid = false;
             }
         }
+        function toggleLockFields() {
+            if ($("#otpDiv").length && !$("#otpDiv").hasClass("d-none")) {
+                $("#email, #password")
+                    .prop("readonly", true)
+                    .addClass("locked-field");
+            } else {
+                $("#email, #password")
+                    .prop("readonly", false)
+                    .removeClass("locked-field");
+            }
+        }
+        if ($("#otpDiv").length) {
+            $("#email, #password").prop("readonly", true).addClass("locked-field");
+        }
+
+// run on page load
+toggleLockFields();
 
         if (!isValid) return;
 

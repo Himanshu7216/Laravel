@@ -68,7 +68,8 @@ class UserController extends Controller
                         //     'otp' => $otp,
                         //     'message' => 'OTP sent to your email'
                         // ]);
-                        return redirect()->back();
+                        // return redirect()->back();
+                        return redirect()->back()->withInput();
                     } else {
                         // Auth::login($user);
                         // $request->session()->regenerate();

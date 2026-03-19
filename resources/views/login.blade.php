@@ -29,8 +29,16 @@
 
         <div class="mb-3">
             <label for="email" class="form-label">Email</label>
-            <input type="text" class="form-control" id="email" name="email" maxlength="50"
-                placeholder="Enter Email here.."  >
+
+                <input type="text"
+                    class="form-control {{ session('enable_two_factors') == 'enable' ? 'locked-field' : '' }}"
+                    id="email"
+                    name="email"
+                    maxlength="50"
+                    value="{{ old('email') }}"
+                    placeholder="Enter Email here.."
+                    {{ session('enable_two_factors') == 'enable' ? 'readonly' : '' }}
+                    >
             <div class="text-danger error-email"></div>
             @if($errors->has('email'))
                 <div class="error text-danger">{{ $errors->first('email') }}</div>
@@ -39,15 +47,24 @@
 
         <div class="mb-3">
             <label for="password" class="form-label">Password</label>
-            <input type="password" class="form-control" id="password" name="password"
-                placeholder="Enter Password here.."  maxlength="20">
+
+                <input type="password"
+                    class="form-control {{ session('enable_two_factors') == 'enable' ? 'locked-field' : '' }}"
+                    id="password"
+                    name="password"
+                    maxlength="20"
+                    value="{{ old('password') }}"
+                    placeholder="Enter Password here.."
+                    {{ session('enable_two_factors') == 'enable' ? 'readonly' : '' }}
+                    >
             <div class="text-danger error-password"></div>
             @if($errors->has('password'))
                 <div class="error text-danger">{{ $errors->first('password') }}</div>
             @endif
         </div>
         {{-- only 2FA user show --}}
-        @if(session('enable_two_factors') == "enable")
+
+        @if(session('login_user_id') && session('enable_two_factors') == "enable")
             <div class="mb-3" id="otpDiv">
                 <label for="otp" class="form-label">OTP</label>
                 <input type="text" class="form-control" id="otp" name="otp" maxlength="6">
