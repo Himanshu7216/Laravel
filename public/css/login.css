@@ -17,3 +17,11 @@
     z-index: 9999;
     min-width: 300px;
 }
+
+input[readonly] {
+    background-color: #ffe0b2 !important;
+    /* light orange */
+    cursor: not-allowed;
+    opacity: 0.8;
+    pointer-events: none;
+}

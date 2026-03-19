@@ -1,7 +1,7 @@
 <h2>Your Login OTP</h2>
 
-<p>Your OTP is:</p>
+<p>Your One-Time Password (OTP) is:</p>
 
 <h1>{{ $otp }}</h1>
 
-<p>This OTP will expire soon.</p>
+<p>This OTP is valid for <strong>5 minutes</strong>. Please do not share it with anyone.</p>

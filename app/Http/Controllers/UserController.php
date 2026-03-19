@@ -8,10 +8,15 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\OtpMail;
+use Mckenziearts\Notify\Facades\LaravelNotify;
 
 
 class UserController extends Controller
 {
+    public function loginform()
+    {
+        return view('login');
+    }
     public function login(Request $request)
     {
         // STEP 1 : If OTP is NOT submitted
@@ -30,48 +35,72 @@ class UserController extends Controller
             ]);
 
             // Check credentials
-            // if(Auth::attempt($request->only('email','password'))){
             $user = User::where('email', $request->email)->first();
 
             if ($user && Hash::check($request->password, $user->password)) {
                 if ($user->status === "active") {
-                    // Generate OTP
-                    $otp = rand(100000, 999999);
-
-                    $user->otp=$otp;
-                    $user->otp_expire_at =now()->addMinutes(5);
-                    $user->save();
-                    // Store OTP and user ID in session
                     session([
-                        'login_otp' => $otp,
-                        'login_user_id' => $user->id
+                        'login_user_id' => $user->id,
+                        'enable_two_factors' => $user->enable_two_factors
                     ]);
+                    //2FA
+                    if ($user->enable_two_factors == "enable") {
+                        // Generate OTP
+                        $otp = rand(100000, 999999);
+                        $user->otp = $otp;
+                        $user->otp_expire_at = now()->addMinutes(5);
+                        $user->save();
+                        // Store OTP and user ID in session
+                        session([
+                            'login_otp' => $otp,
+                            'login_user_id' => $user->id
+                        ]);
 
-                    // Logout until OTP verified
-                    Auth::logout();
+                        // Logout until OTP verified
+                        // Auth::logout();
 
-                    // Send OTP mail
-                    //Mail::to($user->email)->send(new OtpMail($otp));
+                        // Send OTP mail
+                        // Mail::to($user->email)->send(new OtpMail($otp));
+                        Mail::to($user->email)->queue(new OtpMail($otp));
 
-                    return response()->json([
-                        'status' => 'otp_required',
-                        'otp' => $otp,
-                        'message' => 'OTP sent to your email'
-                    ]);
+                        // return response()->json([
+                        //     'status' => 'otp_required',
+                        //     'otp' => $otp,
+                        //     'message' => 'OTP sent to your email'
+                        // ]);
+                        return redirect()->back();
+                    } else {
+                        // Auth::login($user);
+                        // $request->session()->regenerate();
+                        // session()->forget(['login_otp', 'login_user_id']);
+                        // return response()->json([
+                        //     'status' => 'success',
+                        //     'message' => 'Login successful'
+                        // ]);
+                        Auth::login($user);
+                        $request->session()->regenerate();
+                        // return redirect('/home')->with('success', 'Login successful');
+                        LaravelNotify::success('Login successful 🎉');
+                        return redirect('/home');
+                        }
 
                 } else {
-                    Auth::logout();
-                    return response()->json([
-                        'status' => 'error',
-                        'message' => 'Your account is inactive'
-                    ]);
+                    // Auth::logout();
+                    // return response()->json([
+                    //     'status' => 'error',
+                    //     'message' => 'Your account is inactive'
+                    // ]);
+                    return back()->with('error', 'Your account is inactive');
                 }
             }
 
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Invalid email or password'
-            ]);
+            // return response()->json([
+            //     'status' => 'error',
+            //     'message' => 'Invalid email or password'
+            // ]);
+            // return back()->with('error', 'Invalid email or password');
+            LaravelNotify::error('Invalid email or password ❌');
+            return back();
         }
         // STEP 2 : OTP verification
         else {
@@ -85,25 +114,56 @@ class UserController extends Controller
                     'otp.digits' => 'OTP must be exactly 6 digits.'
                 ]
             );
+            // ✅ get user from session
+            $userId = session('login_user_id');
+            $user = User::find($userId);
 
-            $user = User::where('otp',$request->otp)->first();
-            if (!empty($user) && now() <= $user->otp_expire_at) {
-                Auth::login($user);
-                $request->session()->regenerate();
-                session()->forget(['login_otp', 'login_user_id']);
 
-                return response()->json([
-                    'status' => 'success',
-                    'message' => 'Login successful'
-                ]);
+            if (!$user) {
+                // return response()->json([
+                //     'status' => 'error',
+                //     'message' => 'Session expired. Please login again.'
+                // ]);
+                return back()->with('error', 'Session expired. Please login again.');
+            }
+            // ❌ Wrong OTP
+            if ($user->otp !== $request->otp) {
+                // return response()->json([
+                //     'status' => 'error',
+                //     'message' => 'Invalid OTP'
+                //     ]);
+                return back()->with('error', 'Invalid OTP');
             }
 
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Invalid OTP'
+            //current time > expiry time
+            if (now()->gt($user->otp_expire_at)) {
+                // return response()->json([
+                //     'status' => 'error',
+                //     'message' => 'OTP expired. Please request a new one.'
+                // ]);
+                return back()->with('error', 'OTP expired. Please request a new one.');
+            }
+
+            // ✅ OTP valid
+            Auth::login($user);
+            $request->session()->regenerate();
+
+            // clear otp after success (important 🔥)
+            $user->update([
+                'otp' => null,
+                'otp_expire_at' => null
             ]);
+            session()->forget(['login_otp', 'login_user_id']);
+            // return response()->json([
+            //     'status' => 'success',
+            //     'message' => 'Login successful'
+            //     ]);
+            // return redirect('/home')->with('success', 'Login successful');
+            LaravelNotify::success('Login successful with 2FA 🔐');
+            return redirect('/home');
         }
     }
+
 
     public function logout(Request $request)
     {
@@ -113,6 +173,7 @@ class UserController extends Controller
 
         return redirect('/login');
     }
+    // dd(Auth::user());
 
     public function home()
     {
@@ -173,24 +234,31 @@ class UserController extends Controller
 
     public function profile()
     {
+        // $user = User::all();
+        // return view('profile', ['user' => $user]);
         $user = Auth::user();
-        return view('profile', ['user' => $user]);
+        return view('profile', compact('user'));
     }
 
     public function updateProfile(Request $request)
     {
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'min:3', 'max:100', 'regex:/^[a-zA-Z0-9\s]+$/'],
-            'phone' => ['required', 'digits:10'],
-            'profile_picture' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048']
-        ]);
+        $validated = $request->validate(
+            [
+                'name' => ['required', 'string', 'min:3', 'max:100', 'regex:/^[a-zA-Z0-9\s]+$/'],
+                'phone' => ['required', 'digits:10'],
+                'profile' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048']
+            ],
+            [
+                'profile.required' => 'The profile picture must be a file of type: jpg, jpeg, png, webp.'
+            ]
+        );
 
         $user = Auth::user();
         $user->name = $request->name;
         $user->phone = $request->phone;
 
-        if ($request->hasFile('profile_picture')) {
-            $image = $request->file('profile_picture');
+        if ($request->hasFile('profile')) {
+            $image = $request->file('profile');
 
             $uuid = Str::uuid()->toString();    //random string
             $imageName = $image->getClientOriginalName();   // name with extension
@@ -204,9 +272,42 @@ class UserController extends Controller
 
 
         if ($user->save()) {
-            notify()->success('Profile Updated Successfully');
-            return redirect('/home');
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Profile Update Successfully'
+            ]);
+            // return redirect('/home');
         }
-        return back();
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Profile Not Update!'
+        ]);
+        // return back();
+    }
+    public function toggle2FA(Request $request)
+    {
+        // dd($request);
+        $validated = $request->validate([
+            'enable_two_factors' => ['required', 'in:0,1']
+        ]);
+
+        $user = Auth::user();
+        $user->enable_two_factors = $request->enable_two_factors ? "enable" : "disable";
+        $user->save();
+
+        // If enabling → logout
+        // if($request->enable_two_factors == "enable")
+        if ($request->enable_two_factors == 1) {
+            Auth::logout();
+            return response()->json([
+                'status' => 'logout',
+                'message' => '2FA Enabled'
+            ]);
+        } else {
+            return response()->json([
+                'status' => 'success',
+                'message' => '2FA Disabled'
+            ]);
+        }
     }
 }

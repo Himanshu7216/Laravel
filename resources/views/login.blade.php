@@ -13,36 +13,14 @@
         crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
-    <style>
-        #successNotification {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: none;
-            z-index: 9999;
-            min-width: 300px;
-        }
+        <link rel="stylesheet" href="{{ asset('css/login.css') }}">
 
-        #errorNotification {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: none;
-            z-index: 9999;
-            min-width: 300px;
-        }
-    </style>
 </head>
-
 <body>
 
     <div id="successNotification" class="alert alert-success text-center">
-        Login successful!
     </div>
     <div id="errorNotification" class="alert alert-danger text-center">
-
     </div>
 
     <form id="loginForm" class="container col-lg-6 " action="/login" method="POST">
@@ -51,37 +29,45 @@
 
         <div class="mb-3">
             <label for="email" class="form-label">Email</label>
-            <input type="text" class="form-control" id="email" name="email" maxlength="50">
+            <input type="text" class="form-control" id="email" name="email" maxlength="50"
+                placeholder="Enter Email here.."  >
             <div class="text-danger error-email"></div>
             @if($errors->has('email'))
                 <div class="error text-danger">{{ $errors->first('email') }}</div>
             @endif
-
         </div>
 
         <div class="mb-3">
             <label for="password" class="form-label">Password</label>
-            <input type="password" class="form-control" id="password" name="password" maxlength="20">
+            <input type="password" class="form-control" id="password" name="password"
+                placeholder="Enter Password here.."  maxlength="20">
             <div class="text-danger error-password"></div>
             @if($errors->has('password'))
                 <div class="error text-danger">{{ $errors->first('password') }}</div>
             @endif
         </div>
-        <div class="mb-3 d-none" id="otpDiv">
-            <label for="otp" class="form-label">OTP</label>
-            <input type="text" class="form-control" id="otp" name="otp" maxlength="6">
-            <div class="text-danger error-otp"></div>
-            @if($errors->has('otp'))
-                <div class="error text-danger">{{ $errors->first('otp') }}</div>
+        {{-- only 2FA user show --}}
+        @if(session('enable_two_factors') == "enable")
+            <div class="mb-3" id="otpDiv">
+                <label for="otp" class="form-label">OTP</label>
+                <input type="text" class="form-control" id="otp" name="otp" maxlength="6">
+                <div class="text-danger error-otp"></div>
+            </div>
+            @if(session('error'))
+                <div class="alert alert-danger">{{ session('error') }}</div>
             @endif
-        </div>
+
+            @if(session('success'))
+                <div class="alert alert-success">{{ session('success') }}</div>
+            @endif
+        @endif
 
         <button type="submit" class="btn btn-primary">Login</button>
         <P>don't have an account? <a class="text-decoration-none" href="/signup">Sign up</a></P>
     </form>
 
-    <script src="{{ asset('js/login.js') }}"></script>
 
+    <script src="{{ asset('js/login.js') }}"></script>
 </body>
 
 </html>
