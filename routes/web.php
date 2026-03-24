@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\MailController;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
@@ -7,6 +8,10 @@ use App\Http\Controllers\HomeController;
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('email',[MailController::class,'emailForm']);
+Route::post('/send_email',[MailController::class,'send_email']);
+
 Route::middleware('checklogin')->group(function () {
 
     // Route::get('/login',[UserController::class,'loginPage']);
@@ -17,7 +22,6 @@ Route::middleware('checklogin')->group(function () {
     Route::post('/signup', [UserController::class, 'signup']);
 
     Route::get('/home', [UserController::class, 'home'])->name('home');
-
 });
 
 Route::get('/logout', [UserController::class, 'logout']);
